@@ -1,2 +1,2 @@
 # aiopypixel
-A full async wrapper for the Hypixel api
+An asynchronous python wrapper for the Hypixel API.
