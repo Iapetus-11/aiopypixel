@@ -20,18 +20,22 @@ class Client:
         # Do any cleanup here ig
         await self.session.close()
 
-    async def get(self, url):
+    async def get(self, url, raw=False):
         response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
         failed = 0
-        while response.status == 429 and failed <= 50:
-            await asyncio.sleep(.5 + (.05 * failed))  # Will take a total of 86.25 seconds to reach this
+        while response.status == 429 and failed <= 121:  # 121 to give just a little bit of extra leeway
+            await asyncio.sleep(.5)
             response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
-        if failed > 50:
+
+        if failed > 120:
             # RAISE AN EXCEPTION HERE!
             pass
-        return response
+
+        if raw:
+            return response
+        else:
+            return await response.json()
 
     async def getRank(self, player):
-        data = await self.session.get(f'{self.BASE_URL}/player?key=api_key&name={player}')
-        data = await data.json()
+        data = await self.get(f'{self.BASE_URL}/player?key=api_key&name={player}')
         print(data)
