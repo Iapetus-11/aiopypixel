@@ -36,7 +36,8 @@ class Client:
     # Returns list of the uuids for the players who are friends with the specified player
     async def getFriends(self, player_uuid):
         data = await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player_uuid}")
-        print(data)
+        if not data["success"]:  # If player can't be found or status is failed or somethin idk
+            return []
         uuids = []
         for record in data["records"]:
             if record["uuidSender"] != player_uuid:
