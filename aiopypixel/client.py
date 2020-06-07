@@ -36,8 +36,16 @@ class Client:
         else:
             return response
 
+    # Returns list of the uuids for the players who are friends with the specified player
     async def getFriends(self, player_uuid):
-        return await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player_uuid}")
+        data = await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player_uuid}")
+        uuids = []
+        for record in data["records"]:
+            if record["uuidSender"] != player_uuid:
+                uuids.append(record["uuidSender"])
+            else:
+                uuids.append(record["uuidReceiver"])
+        return uuids
 
     async def getRank(self, player):
         return await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")
