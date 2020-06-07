@@ -20,7 +20,7 @@ class Client:
         # Do any cleanup here ig
         await self.session.close()
 
-    async def get(self, url, raw=False):
+    async def get(self, url, json=True):
         response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
         failed = 0
         while response.status == 429 and failed <= 121:  # 121 to give just a little bit of extra leeway
@@ -31,11 +31,13 @@ class Client:
             # RAISE AN EXCEPTION HERE!
             pass
 
-        if raw:
-            return response
-        else:
+        if json:
             return await response.json()
+        else:
+            return response
+
+    async def getFriends(self, player_uuid):
+        return await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player_uuid}")
 
     async def getRank(self, player):
-        data = await self.get(f'{self.BASE_URL}/player?key=api_key&name={player}')
-        print(data)
+        return await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")
