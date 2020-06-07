@@ -17,14 +17,14 @@ class Client:
         self.session = aiohttp.ClientSession()
 
     async def close(self):
-        # CLEANUP HERE
+        # Do any cleanup here ig
         await self.session.close()
 
     async def get(self, url):
         response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
         failed = 0
         while response.status == 429 and failed <= 50:
-            await asyncio.sleep(.5)
+            await asyncio.sleep(.5 + (.05 * failed))  # Will take a total of 86.25 seconds to reach this
             response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
         if failed > 50:
             # RAISE AN EXCEPTION HERE!
