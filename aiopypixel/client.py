@@ -20,7 +20,7 @@ class Client:
         # Do any cleanup here ig
         await self.session.close()
 
-    async def get(self, url, json=True):
+    async def get(self, url):
         response = await self.session.get(url.replace("api_key", choice(self.API_KEYS)))
         failed = 0
         while response.status == 429 and failed <= 121:  # 121 to give just a little bit of extra leeway
@@ -31,14 +31,13 @@ class Client:
             # RAISE AN EXCEPTION HERE!
             pass
 
-        if json:
-            return await response.json()
-        else:
-            return response
+        return await response.json()
 
     # Returns list of the uuids for the players who are friends with the specified player
     async def getFriends(self, player_uuid):
         data = await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player_uuid}")
+        if not data["status"]:  # If player can't be found or status is failed or somethin idk
+            return []
         uuids = []
         for record in data["records"]:
             if record["uuidSender"] != player_uuid:
@@ -46,6 +45,9 @@ class Client:
             else:
                 uuids.append(record["uuidReceiver"])
         return uuids
+
+    async def getGuildFromID(self, guild_id):
+        data = await self.get(f"{self.BASE_URL}/friends?key=api_key&id={guild_id}")
 
     async def getRank(self, player):
         return await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")
