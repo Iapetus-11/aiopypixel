@@ -21,7 +21,7 @@ class Client:
         await self.session.close()
 
     async def get(self, url: str) -> dict:
-        """base method to fetch api response"""
+        """base method to fetch a response from hypixel"""
 
         response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", choice(self.API_KEYS)))
 
