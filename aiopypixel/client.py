@@ -5,6 +5,7 @@ from random import choice
 from typing import Union
 import aiohttp
 import asyncio
+import json
 
 
 class Client:
@@ -41,8 +42,8 @@ class Client:
 
         response = await self.session.get(
             f"https://api.mojang.com/users/profiles/minecraft/{username}")
-        print(await response.read())
-        data = await response.json()
+
+        data = json.loads((await response.read()).split("\n")[0])
 
         if response.status == 204:
             raise InvalidPlayerError("Invalid username was supplied!")
