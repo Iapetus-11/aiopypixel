@@ -37,7 +37,7 @@ class Client:
 
         return await response.json()
 
-    async def UsernameToUUID(self, username: str) -> str:
+    async def usernameToUUID(self, username: str) -> str:
         """takes in an mc username and tries to convert it to a mc uuid"""
 
         response = await self.session.get(
