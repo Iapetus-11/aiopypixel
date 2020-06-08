@@ -201,3 +201,9 @@ class Client:
         data = await self.get('leaderboards?key=api_key')
 
         return data
+
+    async def getWatchdogStats(self) -> dict:
+
+        data = await self.get(f"watchdogstats?key=api_key")
+
+        return data
