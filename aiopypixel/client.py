@@ -5,8 +5,6 @@ from random import choice
 from typing import Union
 import aiohttp
 import asyncio
-import time
-import json
 
 
 class Client:
@@ -42,9 +40,9 @@ class Client:
         """takes in an mc username and tries to convert it to a mc uuid"""
 
         response = await self.session.get(
-            f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
+            f"https://api.mojang.com/users/profiles/minecraft/{username}")
         print(response)
-        data = json.loads(await response.read())
+        data = await response.json()
 
         if response.status == 204:
             raise InvalidPlayerError("Invalid username was supplied!")
@@ -59,7 +57,7 @@ class Client:
         if data.status == 400:
             raise InvalidPlayerError("Invalid UUID was supplied!")
 
-        return json.loads(await data.read())["name"]
+        return (await data.json())["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
