@@ -1,5 +1,6 @@
 
 class Player:
+
     def __init__(self, uuid, hypixel_id, display_name, first_login, last_login, last_logout, exp, stats, achievements,
                  one_time_achievements, guild):
         """A base class for a hypixel player that contains only the most important data"""

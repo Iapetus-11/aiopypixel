@@ -1,5 +1,6 @@
 
 class Guild:
+
     def __init__(self, id, name, coins, created, exp, description, preferred_games, tag, members):
         """Base class for the most import guild data"""
         self.ID = id
