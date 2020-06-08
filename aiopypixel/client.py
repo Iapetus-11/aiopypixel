@@ -18,7 +18,7 @@ class Client:
         self.session = aiohttp.ClientSession()
 
     async def close(self):
-        """Used for safe client cleanup and stuff"""
+        """used for safe client cleanup and stuff"""
         await self.session.close()
 
     async def get(self, url: str) -> dict:
@@ -27,23 +27,23 @@ class Client:
         response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", choice(self.API_KEYS)))
 
         if response.status == 429:
-            raise RateLimited("Hypixel")
+            raise RateLimitError("Hypixel")
 
         return await response.json()
 
-    async def GamertagToUUID(self, gamertag) -> str:
-        """takes in an mc gamertag and tries to convert it to a mc uuid"""
+    async def UsernameToUUID(self, gamertag) -> str:
+        """takes in an mc username and tries to convert it to a mc uuid"""
 
         response = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
         data = await response.json()
 
         if response.status == 204:
-            raise InvalidPlayerError("Invalid gamertag was supplied!")
+            raise InvalidPlayerError("Invalid username was supplied!")
 
         return j[0]["id"]
 
     async def UUIDToGamertag(self, uuid) -> str:
-        """takes in an mc uuid and converts it to an mc gamertag"""
+        """takes in an mc uuid and converts it to an mc username"""
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
 
@@ -69,7 +69,7 @@ class Client:
         if the user doesn't have any friends, returns an empty list"""
 
         if len(player) < 17:
-            player = await self.GamertagToUUID(player)
+            player = await self.UsernameToUUID(player)
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
@@ -89,7 +89,7 @@ class Client:
         """returns the guild id (if any) of that which the provided player is in"""
 
         if len(player) < 17:
-            player = await self.GamertagToUUID(player)
+            player = await self.UsernameToUUID(player)
 
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
