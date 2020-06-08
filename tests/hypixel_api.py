@@ -18,7 +18,7 @@ async def leaderboard():
 
 async def test_get_friends():
     client = aiopypixel.Client(api_key)
-    print(await client.getPlayerFriends("ajdjisjiwfojhfdijrk"))
+    print(await client.getPlayerFriends("TrustedMercury"))
     await client.close()
 
 
