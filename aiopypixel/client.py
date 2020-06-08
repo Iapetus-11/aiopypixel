@@ -161,3 +161,5 @@ class Client:
 
         if not data["success"]:
             raise Error("An unknown error occurred!", data.get("cause"))
+
+        return data
