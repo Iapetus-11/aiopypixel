@@ -1,4 +1,4 @@
-from typing import Union
+from .exceptions.exceptions import *
 import aiohttp
 import asyncio
 from random import choice
