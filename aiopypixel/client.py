@@ -5,6 +5,8 @@ from random import choice
 
 
 class RateLimited(Exception):
+    """A basic ratelimited error class when the bot gets ratelimited"""
+
     def __init__(self, specifics, message="You're being rate limited! ({0})"):
         self.message = message.format(specifics)
         super().__init__(self.message)
@@ -14,6 +16,8 @@ class RateLimited(Exception):
 
 
 class Error(Exception):
+    """A basic error class for easy handling/raising of a multitude of errors"""
+
     def __init__(self, message="An error occurred!", cause="unknown"):
         self.message = message + "\nCause: " + str(cause)
         super().__init__(self.message)
@@ -35,7 +39,7 @@ class Client:
         self.session = aiohttp.ClientSession()
 
     async def close(self):
-        # Safe client cleanup and exit
+        """Used for safe client cleanup and stuff"""
         await self.session.close()
 
     async def get(self, url: str) -> dict:
