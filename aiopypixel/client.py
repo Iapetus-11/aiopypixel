@@ -43,7 +43,7 @@ class Client:
         response = await self.session.get(
             f"https://api.mojang.com/users/profiles/minecraft/{username}")
 
-        data = json.loads((await response.read()).split("\n")[0])
+        data = json.loads((await response.read()).decode("utf-8").split("\n")[0])
 
         if response.status == 204:
             raise InvalidPlayerError("Invalid username was supplied!")
