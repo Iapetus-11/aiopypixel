@@ -46,6 +46,8 @@ class Client:
         if response.status == 204 or data == []:
             raise InvalidPlayerError("Invalid username was supplied!")
 
+        print("--" + data[0]["id"] + "--")
+
         return data[0]["id"]
 
     async def UUIDToUsername(self, uuid: str) -> str:
