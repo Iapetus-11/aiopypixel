@@ -1,5 +1,5 @@
 class Player:
-    def __init__(self, uuid, hypixel_id, display_name, first_login, last_login, xp, achievements):
+    def __init__(self, uuid, hypixel_id, display_name, first_login, last_login, xp, achievements, stats):
         self.UUID = uuid
         self.HYPIXEL_ID = hypixel_id
         self.DISPLAY_NAME = display_name
@@ -7,3 +7,4 @@ class Player:
         self.LAST_LOGIN = last_login
         self.XP = xp
         self.ACHIEVEMENTS = achievements
+        self.STATS = stats

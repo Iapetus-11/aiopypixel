@@ -1,4 +1,5 @@
 from .exceptions.exceptions import *
+from .models.player import Player
 from random import choice
 import aiohttp
 import asyncio
@@ -64,14 +65,37 @@ class Client:
         data = await self.get(f"key?key={key}")
 
         if not data["status"]:
-            raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
+            raise Error(f"An error occurred while fetching information on a key! ({data.get('cause')})")
 
         return data
 
     async def getPlayerRaw(self, player) -> dict:
+        """returns a player's data from the api"""
+
+        if len(player) <= 16:
+            player = await self.UsernameToUUID(player)
+
+        data = await self.get(f"player?key=api_key&uuid={player}")
+
+        if not data["success"]:
+            raise Error(f"An error occurred while fetching a player from the api! ({data.get('cause')})")
+
+        return data
+
+    async def getPlayer(self, player) -> Player:
         """returns a player object"""
 
-        data = await self.get(f"player?key=api_key&uuid=")
+        raw_player = await self.getPlayerRaw(player)
+
+        return Player(
+            raw_player["uuid"],
+            raw_player["_id"], raw_player["displayname"],
+            raw_player["firstLogin"],
+            raw_player["lastLogin"],
+            raw_player["networkExp"],
+            raw_player["achievements"],
+            raw_player["stats"]
+        )
 
     async def getPlayerFriends(self, player: str) -> list:
         """returns the friends list of the provided player (list of uuids)
