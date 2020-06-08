@@ -175,8 +175,4 @@ class Client:
 
         return data
 
-    async def getWatchdogStats(self) -> dict:
 
-        data = await self.get(f"watchdogstats?key=api_key")
-
-        return data
