@@ -1,8 +1,7 @@
 from .exceptions.exceptions import *
+from random import choice
 import aiohttp
 import asyncio
-from random import choice
-
 
 class Client:
 
@@ -40,15 +39,15 @@ class Client:
         if response.status == 204:
             raise InvalidPlayerError("Invalid username was supplied!")
 
-        return j[0]["id"]
+        return data["id"]
 
-    async def UUIDToGamertag(self, uuid) -> str:
-        """takes in an mc uuid and converts it to an mc username"""
+    async def UUIDToUsername(self, uuid) -> str:
+        """takes in a minecraft UUID and converts it to a minecraft username"""
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
 
         if data.status == 400:
-            raise InvalidPlayerError("Invalid uuid was supplied!")
+            raise InvalidPlayerError("Invalid UUID was supplied!")
 
         return (await data.json())["name"]
 
@@ -130,20 +129,20 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred! ({data.get('cause')})")
+            raise Error(data.get('cause'))
 
         if data["guild"] is None:
             raise Error("Guild not found!")
 
         return data["guild"]
 
-    async def getPlayerCounts(self):
+    async def getGameCounts(self):
         """fetches the player counts for every game on hypixel"""
 
         data = await self.get(f"gameCounts?key=api_key")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred! ({data.get('cause')})")
+            raise Error(data.get('cause'))
 
         return data
 
@@ -151,8 +150,14 @@ class Client:
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
-            player = await self.name_to_uuid(player)
+            player = await self.UsernameToUUID(player)
 
-        data = await (await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")).json()
+        data = await self.get(f"{self.BASE_URL}/player?key={{api_key}}&name={player}")
+
+        return data
+
+    async def getLeaderboard(self):
+
+        data = await self.get('/leaderboards?key=api_key')
 
         return data
