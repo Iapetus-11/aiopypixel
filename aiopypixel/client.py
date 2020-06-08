@@ -20,35 +20,46 @@ class Client:
 
     async def exit(self):
         """safe cleanup and exit"""
+
         await self.session.close()
 
-    async def get(self, url: str) -> list:
+    async def get(self, url: str):
         """base method to fetch api response"""
+
         response = await self.session.get(url.replace("api_key", random.choice(self.API_KEYS)))
 
         if response.status == 429:
             raise RateLimitError
 
-        return [response.status, await response.json()]
+        return response
 
-    async def uuid_name_converter(self, player):
-        """converts name to uuid and uuid to name depending on input"""
-        if len(player) < 16:  # provided data is uuid
-            data = await self.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{player}')
-            if data[0] == 400 or data[1]["error"] == "Bad Request":
-                raise InvalidPlayer
+    async def uuid_to_name(self, uuid: str):
 
+        if len(uuid) > 16:  # provided data is uuid
+            response = await self.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}')
+            if response.status == 400:
+                raise InvalidPlayerError
+            else:
+                data = await response.json()
+                return data["name"]
 
-    async def getFriends(self, player) -> Union[bool, list]:
+    async def name_to_uuid(self, name: str) -> str:
 
+        response = await self.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+        if response.status == 204:
+            raise InvalidPlayerError
+        else:
+            data = await response.json()
+            return data["id"]
+
+    async def getFriends(self, player: str) -> Union[bool, list]:
         """returns the friends list of the provided player (list of uuids)
         if the user doesn't have any friends, returns an empty list"""
 
         if len(player) < 16:
-            pass  # replace name with uuid
+            player = await self.name_to_uuid(player)
 
-        data = await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player}")
-        data = data[1]
+        data = await (await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player}")).json()
 
         if not data["success"]:
             return False  # raise error later
@@ -63,13 +74,16 @@ class Client:
         return uuids
 
     async def getGuildFromID(self, guild_id):
+        """gets hypixel guild data from the provided ID"""
 
-        data = await self.get(f"{self.BASE_URL}/friends?key=api_key&id={guild_id}")
-        data = data[1]
+        data = await (await self.get(f"{self.BASE_URL}/friends?key=api_key&id={guild_id}")).json()
 
     async def getRank(self, player):
         """returns the provided player's hypixel rank"""
-        data = await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")
-        data = data[1]
+
+        if len(player) < 16:
+            player = await self.name_to_uuid(player)
+
+        data = await (await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")).json()
 
         return data
