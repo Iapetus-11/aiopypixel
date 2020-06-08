@@ -4,28 +4,6 @@ import asyncio
 from random import choice
 
 
-class RateLimited(Exception):
-    """A basic ratelimited error class when the bot gets ratelimited"""
-
-    def __init__(self, specifics, message="You're being rate limited! ({0})"):
-        self.message = message.format(specifics)
-        super().__init__(self.message)
-
-    def __str__(self):
-        return self.message
-
-
-class Error(Exception):
-    """A basic error class for easy handling/raising of a multitude of errors"""
-
-    def __init__(self, message="An error occurred!", cause="unknown"):
-        self.message = message + "\nCause: " + str(cause)
-        super().__init__(self.message)
-
-    def __str__(self):
-        return self.message
-
-
 class Client:
     def __init__(self, api_keys):
         # Handles the instance of a singular key
@@ -66,12 +44,12 @@ class Client:
     async def UUIDToGamertag(self, uuid) -> str:
         """takes in an mc uuid and converts it to an mc gamertag"""
 
-        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
+        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
 
         if data.status == 400:
             raise InvalidPlayerError("Invalid uuid was supplied!")
 
-        return (await data.json())[len(j) - 1]["name"]
+        return (await data.json())["name"]
 
     async def getKeyData(self, key=None):
         """fetches information from the api about the key used
@@ -83,7 +61,7 @@ class Client:
         data = await self.get(f"key?key={key}")
 
         if not data["status"]:
-            raise Error("An error occured while fetching information on a key!", data.get("cause"))
+            raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
 
     async def getPlayerFriends(self, player) -> list:
         """returns the friends list of the provided player (list of uuids)
@@ -95,7 +73,7 @@ class Client:
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
         if not data["success"]:
-            raise Error("Error while getting player friends!", data.get("cause"))
+            raise Error(f"Error while getting player friends! ({data.get('cause')})")
 
         uuids = []
 
@@ -115,7 +93,7 @@ class Client:
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
         if not data["success"]:
-            raise Error("Error while getting player guild!", data.get("cause"))
+            raise Error(f"Error while getting player guild! ({data.get('cause')})")
 
         return data["guild"]
 
@@ -125,10 +103,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_name}")
 
         if not data["success"]:
-            raise Error("An unknown error occurred!", data.get("cause"))
+            raise Error(f"An unknown error occurred! ({data.get('cause')})")
 
         if data["guild"] is None:
-            raise Error("Guild not found!", "The API returned null!")
+            raise Error("Guild not found!")
 
         return data["guild"]["_id"]
 
@@ -138,10 +116,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise Error("An unknown error occurred!", data.get("cause"))
+            raise Error(f"An unknown error occurred ({data.get('cause')})!")
 
         if data["guild"] is None:
-            raise Error("Guild not found!", "The API returned null!")
+            raise Error("Guild not found!")
 
         return data["guild"]["_id"]
 
@@ -151,10 +129,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise Error("An unknown error occurred!", data.get("cause"))
+            raise Error(f"An unknown error occurred! ({data.get('cause')})")
 
         if data["guild"] is None:
-            raise Error("Guild not found!", "The API returned null!")
+            raise Error("Guild not found!")
 
         return data["guild"]
 
@@ -164,11 +142,11 @@ class Client:
         data = await self.get(f"gameCounts?key=api_key")
 
         if not data["success"]:
-            raise Error("An unknown error occurred!", data.get("cause"))
+            raise Error(f"An unknown error occurred! ({data.get('cause')})")
 
         return data
 
-    async def getRank(self, player):
+    async def getRank(self, player):  # still a wip
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
