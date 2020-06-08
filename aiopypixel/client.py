@@ -174,5 +174,3 @@ class Client:
         data = await self.get('leaderboards?key=api_key')
 
         return data
-
-
