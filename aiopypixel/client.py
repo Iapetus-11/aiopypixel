@@ -5,6 +5,7 @@ from random import choice
 
 
 class Client:
+
     def __init__(self, api_keys):
         # Handles the instance of a singular key
         if not isinstance(api_keys, list):
