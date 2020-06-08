@@ -1,3 +1,4 @@
+
 class Player:
     def __init__(self, uuid, hypixel_id, display_name, first_login, last_login, last_logout, exp, stats, achievements,
                  one_time_achievements):

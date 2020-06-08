@@ -84,7 +84,7 @@ class Client:
         if not data["success"]:
             raise Error(f"An error occurred while fetching a player from the api! ({data.get('cause')})")
 
-        return data
+        return data["player"]
 
     async def getPlayer(self, player) -> Player:
         """returns a player object"""
@@ -138,7 +138,7 @@ class Client:
 
         return data["guild"]
 
-    async def getGuildID(self, guild_name: str) -> str:
+    async def getGuildIDByName(self, guild_name: str) -> str:
         """fetches a hypixel guild id based on the given guild name"""
 
         data = await self.get(f"guild?key=api_key&name={guild_name}")
@@ -151,7 +151,7 @@ class Client:
 
         return data["guild"]["_id"]
 
-    async def getGuildName(self, guild_id: str) -> str:
+    async def getGuildNameByID(self, guild_id: str) -> str:
         """fetches a hypixel guild name based on the given guild id"""
 
         data = await self.get(f"guild?key=api_key&name={guild_id}")
