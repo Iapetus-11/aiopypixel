@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aiopypixel",
-    version="0.1",
+    version="1.0",
     author="TrustedMercury & Iapetus11",
     description="An asynchronous python wrapper for the Hypixel API.",
     long_description=long_description,
@@ -13,9 +13,9 @@ setuptools.setup(
     url="https://github.com/Villager-Dev/aiopypixel",
     packages=setuptools.find_packages(),
     classifiers=[
-            "Programming Language :: Python :: 3",
-            "License :: OSI Approved :: MIT License",
-            "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
     python_requires='>=3.6'
 )
