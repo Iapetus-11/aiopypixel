@@ -35,7 +35,8 @@ class Client:
     async def UsernameToUUID(self, username: str) -> str:
         """takes in an mc username and tries to convert it to a mc uuid"""
 
-        response = await self.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
+        response = await self.session.get(
+            f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
         data = await response.json()
 
         if response.status == 204:
@@ -53,7 +54,7 @@ class Client:
 
         return (await data.json())["name"]
 
-    async def getKeyData(self, key: str = None):
+    async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
         uses a random key if none is specified"""
 
@@ -66,6 +67,11 @@ class Client:
             raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
 
         return data
+
+    async def getPlayerRaw(self, player) -> dict:
+        """returns a player object"""
+
+        data = await self.get(f"player?key=api_key&uuid=")
 
     async def getPlayerFriends(self, player: str) -> list:
         """returns the friends list of the provided player (list of uuids)
@@ -101,7 +107,7 @@ class Client:
 
         return data["guild"]
 
-    async def getGuildID(self, guild_name):
+    async def getGuildID(self, guild_name) -> str:
         """fetches a hypixel guild id based on the given guild name"""
 
         data = await self.get(f"guild?key=api_key&name={guild_name}")
@@ -114,7 +120,7 @@ class Client:
 
         return data["guild"]["_id"]
 
-    async def getGuildName(self, guild_id):
+    async def getGuildName(self, guild_id) -> str:
         """fetches a hypixel guild name based on the given guild id"""
 
         data = await self.get(f"guild?key=api_key&name={guild_id}")
@@ -125,9 +131,9 @@ class Client:
         if data["guild"] is None:
             raise Error("Guild not found!")
 
-        return data["guild"]["_id"]
+        return data["guild"]["name"]
 
-    async def getGuildData(self, guild_id):
+    async def getGuildData(self, guild_id) -> dict:
         """fetches a hypixel guild based on the given guild id"""
 
         data = await self.get(f"guild?key=api_key&name={guild_id}")
