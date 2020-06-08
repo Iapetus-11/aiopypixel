@@ -183,15 +183,15 @@ class Client:
         raw_guild = await self.getGuildDataRaw(guild_id)
 
         return Guild(
-            raw_guild['guild']['_id'],
-            raw_guild['guild']['name'],
-            raw_guild['guild']['coins'],
-            raw_guild['guild']['created'],
-            raw_guild['guild']['exp'],
-            raw_guild['guild']['description'],
-            raw_guild['guild']['preferredGames'],
-            raw_guild['guild']['tag'],
-            raw_guild['guild']['members'])
+            raw_guild['_id'],
+            raw_guild['name'],
+            raw_guild['coins'],
+            raw_guild['created'],
+            raw_guild['exp'],
+            raw_guild['description'],
+            raw_guild['preferredGames'],
+            raw_guild['tag'],
+            raw_guild['members'])
 
     async def getGameCounts(self) -> dict:
         """fetches the player counts for every game on hypixel"""
