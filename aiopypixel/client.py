@@ -20,7 +20,8 @@ class Client:
 
     async def exit(self):
 
-        # Safe client cleanup and exit
+        """safe cleanup and exit"""
+
         await self.session.close()
 
     async def get(self, url: str) -> dict:
@@ -34,8 +35,6 @@ class Client:
 
         return await response.json()
 
-    # Returns list of the uuids for the players who are friends with the specified player
-    # Returns an empty list if the user is not found.
     async def getFriends(self, player) -> Union[bool, list]:
 
         """returns the friends list of the provided player (list of uuids)
