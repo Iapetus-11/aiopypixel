@@ -7,5 +7,4 @@ async def test_get_friends():
     print(await client.getFriends("268e0a03728e46c0bd27dbfc3178e617"))
     await client.exit()
 
-
 asyncio.get_event_loop().run_until_complete(test_get_friends())
