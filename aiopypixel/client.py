@@ -55,11 +55,11 @@ class Client:
     async def GamertagToUUID(self, gamertag) -> str:
         """takes in an mc gamertag and tries to convert it to a mc uuid"""
 
-        data = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
-        data = await data.json()
+        response = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
+        data = await response.json()
 
-        if not data:
-            raise Error("An error occurred while converting gamertag to uuid!", "User couldn't be found!")
+        if response.status == 204:
+            raise InvalidPlayerError("Invalid gamertag was supplied!")
 
         return j[0]["id"]
 
@@ -68,8 +68,8 @@ class Client:
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
-        if data.status == 204:
-            raise Error("An error occurred while converting uuid to gamertag!", "User couldn't be found!")
+        if data.status == 400:
+            raise InvalidPlayerError("Invalid uuid was supplied!")
 
         return (await data.json())[len(j) - 1]["name"]
 
@@ -165,5 +165,15 @@ class Client:
 
         if not data["success"]:
             raise Error("An unknown error occurred!", data.get("cause"))
+
+        return data
+
+    async def getRank(self, player):
+        """returns the provided player's hypixel rank"""
+
+        if len(player) < 16:
+            player = await self.name_to_uuid(player)
+
+        data = await (await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")).json()
 
         return data
