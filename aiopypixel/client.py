@@ -101,7 +101,8 @@ class Client:
             raw_player["networkExp"],
             raw_player["stats"],
             raw_player["achievements"],
-            raw_player["achievementsOneTime"]
+            raw_player["achievementsOneTime"],
+            await self.getPlayerGuild(player)
         )
 
     async def getPlayerFriends(self, player: str) -> list:
@@ -126,7 +127,8 @@ class Client:
         return uuids
 
     async def getPlayerGuild(self, player: str) -> str:
-        """returns the guild id (if any) of that which the provided player is in"""
+        """returns the guild id (if any) of that which the provided player is in
+        returns None if the user doesn't have a guild"""
 
         if len(player) <= 16:
             player = await self.UsernameToUUID(player)
