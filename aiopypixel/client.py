@@ -42,6 +42,7 @@ class Client:
 
         response = await self.session.get(
             f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
+        print(response)
         data = await response.json()
 
         if response.status == 204:
@@ -77,7 +78,7 @@ class Client:
         """returns a player's data from the api"""
 
         if len(player) <= 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"player?key=api_key&uuid={player}")
 
@@ -110,7 +111,7 @@ class Client:
         if the user doesn't have any friends, returns an empty list"""
 
         if len(player) < 17:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
@@ -131,7 +132,7 @@ class Client:
         returns None if the user doesn't have a guild"""
 
         if len(player) <= 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
@@ -210,7 +211,7 @@ class Client:
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"{self.BASE_URL}/player?key={{api_key}}&name={player}")
 
