@@ -1,5 +1,6 @@
 from .exceptions.exceptions import *
 from .models.player import Player
+from .models.guild import Guild
 from random import choice
 from typing import Union
 import aiohttp
@@ -163,10 +164,10 @@ class Client:
 
         return data["guild"]["name"]
 
-    async def getGuildData(self, guild_id: str) -> dict:
+    async def getGuildDataRaw(self, guild_id: str) -> dict:
         """fetches a hypixel guild based on the given guild id"""
 
-        data = await self.get(f"guild?key=api_key&name={guild_id}")
+        data = await self.get(f"guild?key=api_key&id={guild_id}")
 
         if not data["success"]:
             raise Error(data.get('cause'))
@@ -175,6 +176,22 @@ class Client:
             raise Error("Guild not found!")
 
         return data["guild"]
+
+    async def getGuildData(self, guild_id: str) -> Guild:
+        """returns a guild object"""
+
+        raw_guild = await self.getGuildDataRaw(guild_id)
+
+        return Guild(
+            raw_guild['guild']['_id'],
+            raw_guild['guild']['name'],
+            raw_guild['guild']['coins'],
+            raw_guild['guild']['created'],
+            raw_guild['guild']['exp'],
+            raw_guild['guild']['description'],
+            raw_guild['guild']['preferredGames'],
+            raw_guild['guild']['tag'],
+            raw_guild['guild']['members'])
 
     async def getGameCounts(self) -> dict:
         """fetches the player counts for every game on hypixel"""
