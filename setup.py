@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aiopypixel",
-    version="1.0.8",
+    version="1.0.9",
     author="TrustedMercury & Iapetus11",
     description="An asynchronous python wrapper for the Hypixel API.",
     long_description=long_description,
