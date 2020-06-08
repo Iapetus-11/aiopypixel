@@ -93,9 +93,11 @@ class Client:
             raw_player["displayname"],
             raw_player["firstLogin"],
             raw_player["lastLogin"],
+            raw_player["lastLogout"],
             raw_player["networkExp"],
+            raw_player["stats"],
             raw_player["achievements"],
-            raw_player["stats"]
+            raw_player["achievementsOneTime"]
         )
 
     async def getPlayerFriends(self, player: str) -> list:
