@@ -113,10 +113,10 @@ class Client:
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
-        print(data)
-
         if not data["success"]:
             raise Error(f"Error while getting player friends! ({data.get('cause')})")
+
+        print(data)
 
         uuids = []
 
