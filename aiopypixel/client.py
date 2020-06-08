@@ -46,8 +46,6 @@ class Client:
         if response.status == 204 or data == []:
             raise InvalidPlayerError("Invalid username was supplied!")
 
-        print("--" + data[0]["id"] + "--")
-
         return data[0]["id"]
 
     async def UUIDToUsername(self, uuid: str) -> str:
@@ -112,6 +110,8 @@ class Client:
 
         if len(player) < 17:
             player = await self.usernameToUUID(player)
+
+        print(player)
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
