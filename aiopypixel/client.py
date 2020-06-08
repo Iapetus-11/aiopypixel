@@ -1,10 +1,12 @@
 from .exceptions.exceptions import *
+from random import choice
 import aiohttp
 import asyncio
-from random import choice
+import time
 
 
 class Client:
+
     def __init__(self, api_keys):
         # Handles the instance of a singular key
         if not isinstance(api_keys, list):
@@ -17,7 +19,7 @@ class Client:
         self.session = aiohttp.ClientSession()
 
     async def close(self):
-        """Used for safe client cleanup and stuff"""
+        """used for safe client cleanup and stuff"""
         await self.session.close()
 
     async def get(self, url: str) -> dict:
@@ -26,32 +28,32 @@ class Client:
         response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", choice(self.API_KEYS)))
 
         if response.status == 429:
-            raise RateLimited("Hypixel")
+            raise RateLimitError("Hypixel")
 
         return await response.json()
 
-    async def GamertagToUUID(self, gamertag) -> str:
-        """takes in an mc gamertag and tries to convert it to a mc uuid"""
+    async def UsernameToUUID(self, username: str) -> str:
+        """takes in an mc username and tries to convert it to a mc uuid"""
 
-        response = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
+        response = await self.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
         data = await response.json()
 
         if response.status == 204:
-            raise InvalidPlayerError("Invalid gamertag was supplied!")
+            raise InvalidPlayerError("Invalid username was supplied!")
 
-        return j[0]["id"]
+        return data["id"]
 
-    async def UUIDToGamertag(self, uuid) -> str:
-        """takes in an mc uuid and converts it to an mc gamertag"""
+    async def UUIDToUsername(self, uuid: str) -> str:
+        """takes in a minecraft UUID and converts it to a minecraft username"""
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
 
         if data.status == 400:
-            raise InvalidPlayerError("Invalid uuid was supplied!")
+            raise InvalidPlayerError("Invalid UUID was supplied!")
 
         return (await data.json())["name"]
 
-    async def getKeyData(self, key=None):
+    async def getKeyData(self, key: str = None):
         """fetches information from the api about the key used
         uses a random key if none is specified"""
 
@@ -63,12 +65,14 @@ class Client:
         if not data["status"]:
             raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
 
-    async def getPlayerFriends(self, player) -> list:
+        return data
+
+    async def getPlayerFriends(self, player: str) -> list:
         """returns the friends list of the provided player (list of uuids)
         if the user doesn't have any friends, returns an empty list"""
 
         if len(player) < 17:
-            player = await self.GamertagToUUID(player)
+            player = await self.UsernameToUUID(player)
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
@@ -84,11 +88,11 @@ class Client:
                 uuids.append(record["uuidReceiver"])
         return uuids
 
-    async def getPlayerGuild(self, player) -> str:
+    async def getPlayerGuild(self, player: str) -> str:
         """returns the guild id (if any) of that which the provided player is in"""
 
-        if len(player) < 17:
-            player = await self.GamertagToUUID(player)
+        if len(player) <= 16:
+            player = await self.UsernameToUUID(player)
 
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
@@ -129,20 +133,20 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred! ({data.get('cause')})")
+            raise Error(data.get('cause'))
 
         if data["guild"] is None:
             raise Error("Guild not found!")
 
         return data["guild"]
 
-    async def getPlayerCounts(self):
+    async def getGameCounts(self):
         """fetches the player counts for every game on hypixel"""
 
         data = await self.get(f"gameCounts?key=api_key")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred! ({data.get('cause')})")
+            raise Error(data.get('cause'))
 
         return data
 
@@ -150,8 +154,14 @@ class Client:
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
-            player = await self.name_to_uuid(player)
+            player = await self.UsernameToUUID(player)
 
-        data = await (await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")).json()
+        data = await self.get(f"{self.BASE_URL}/player?key={{api_key}}&name={player}")
+
+        return data
+
+    async def getLeaderboard(self):
+
+        data = await self.get('leaderboards?key=api_key')
 
         return data
