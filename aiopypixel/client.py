@@ -1,3 +1,4 @@
+from typing import Union
 import aiohttp
 import asyncio
 import random
@@ -35,7 +36,7 @@ class Client:
 
     # Returns list of the uuids for the players who are friends with the specified player
     # Returns an empty list if the user is not found.
-    async def getFriends(self, player) -> list:
+    async def getFriends(self, player) -> Union[bool, list]:
 
         """returns the friends list of the provided player (list of uuids)
         if the user doesn't have any friends, returns an empty list"""
@@ -46,7 +47,7 @@ class Client:
         data = await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player}")
 
         if not data["success"]:
-            pass  # raise error later
+            return False  # raise error later
 
         uuids = []
 
