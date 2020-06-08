@@ -1,5 +1,6 @@
 from .exceptions.exceptions import *
 from random import choice
+from typing import Union
 import aiohttp
 import asyncio
 import time
@@ -7,7 +8,9 @@ import time
 
 class Client:
 
-    def __init__(self, api_keys):
+    def __init__(self, api_keys: Union[list, str]):
+        """basic initialization of the hypixel API client"""
+
         # Handles the instance of a singular key
         if not isinstance(api_keys, list):
             api_keys = [api_keys]
@@ -107,7 +110,7 @@ class Client:
 
         return data["guild"]
 
-    async def getGuildID(self, guild_name) -> str:
+    async def getGuildID(self, guild_name: str) -> str:
         """fetches a hypixel guild id based on the given guild name"""
 
         data = await self.get(f"guild?key=api_key&name={guild_name}")
@@ -120,7 +123,7 @@ class Client:
 
         return data["guild"]["_id"]
 
-    async def getGuildName(self, guild_id) -> str:
+    async def getGuildName(self, guild_id: str) -> str:
         """fetches a hypixel guild name based on the given guild id"""
 
         data = await self.get(f"guild?key=api_key&name={guild_id}")
@@ -133,7 +136,7 @@ class Client:
 
         return data["guild"]["name"]
 
-    async def getGuildData(self, guild_id) -> dict:
+    async def getGuildData(self, guild_id: str) -> dict:
         """fetches a hypixel guild based on the given guild id"""
 
         data = await self.get(f"guild?key=api_key&name={guild_id}")
@@ -146,7 +149,7 @@ class Client:
 
         return data["guild"]
 
-    async def getGameCounts(self):
+    async def getGameCounts(self) -> dict:
         """fetches the player counts for every game on hypixel"""
 
         data = await self.get(f"gameCounts?key=api_key")
@@ -156,7 +159,7 @@ class Client:
 
         return data
 
-    async def getRank(self, player):  # still a wip
+    async def getRank(self, player: str) -> dict:
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
@@ -166,13 +169,13 @@ class Client:
 
         return data
 
-    async def getLeaderboard(self):
+    async def getLeaderboard(self) -> dict:
 
         data = await self.get('leaderboards?key=api_key')
 
         return data
 
-    async def getWatchdogStats(self):
+    async def getWatchdogStats(self) -> dict:
 
         data = await self.get(f"watchdogstats?key=api_key")
 
