@@ -6,6 +6,7 @@ from typing import Union
 import aiohttp
 import asyncio
 import time
+import json
 
 
 class Client:
@@ -43,7 +44,7 @@ class Client:
         response = await self.session.get(
             f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
         print(response)
-        data = await response.json()
+        data = json.loads(await response.read())
 
         if response.status == 204:
             raise InvalidPlayerError("Invalid username was supplied!")
@@ -58,7 +59,7 @@ class Client:
         if data.status == 400:
             raise InvalidPlayerError("Invalid UUID was supplied!")
 
-        return (await data.json())["name"]
+        return json.loads(await data.read())["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
