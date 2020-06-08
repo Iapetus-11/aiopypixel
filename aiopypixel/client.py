@@ -191,7 +191,8 @@ class Client:
             raw_guild['description'],
             raw_guild['preferredGames'],
             raw_guild['tag'],
-            raw_guild['members'])
+            raw_guild['members']
+        )
 
     async def getGameCounts(self) -> dict:
         """fetches the player counts for every game on hypixel"""
