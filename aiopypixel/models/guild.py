@@ -1,13 +1,14 @@
 
 class Guild:
 
-    def __init__(self, name, coins, created, exp, description, preferredGames, tag, players):
+    def __init__(self, id, name, coins, created, exp, description, preferredGames, tag, members):
 
-        self.name = name
-        self.coins = coins
-        self.created = created
-        self.exp = exp
-        self.description = description
-        self.preferredGames = preferredGames
-        self.tag = tag
-        self.players = players
+        self.ID = id
+        self.NAME = name
+        self.COINS = coins
+        self.CREATED = created
+        self.EXP = exp
+        self.DESCRIPTION = description
+        self.PREFERRED_GAMES = preferredGames
+        self.TAG = tag
+        self.MEMBERS = members
