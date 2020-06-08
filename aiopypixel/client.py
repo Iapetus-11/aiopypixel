@@ -2,6 +2,8 @@ from .exceptions.exceptions import *
 from random import choice
 import aiohttp
 import asyncio
+import time
+
 
 class Client:
 
@@ -30,10 +32,10 @@ class Client:
 
         return await response.json()
 
-    async def UsernameToUUID(self, gamertag) -> str:
+    async def UsernameToUUID(self, username: str) -> str:
         """takes in an mc username and tries to convert it to a mc uuid"""
 
-        response = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
+        response = await self.session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
         data = await response.json()
 
         if response.status == 204:
@@ -41,7 +43,7 @@ class Client:
 
         return data["id"]
 
-    async def UUIDToUsername(self, uuid) -> str:
+    async def UUIDToUsername(self, uuid: str) -> str:
         """takes in a minecraft UUID and converts it to a minecraft username"""
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
@@ -51,7 +53,7 @@ class Client:
 
         return (await data.json())["name"]
 
-    async def getKeyData(self, key=None):
+    async def getKeyData(self, key: str = None):
         """fetches information from the api about the key used
         uses a random key if none is specified"""
 
@@ -63,7 +65,9 @@ class Client:
         if not data["status"]:
             raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
 
-    async def getPlayerFriends(self, player) -> list:
+        return data
+
+    async def getPlayerFriends(self, player: str) -> list:
         """returns the friends list of the provided player (list of uuids)
         if the user doesn't have any friends, returns an empty list"""
 
@@ -84,10 +88,10 @@ class Client:
                 uuids.append(record["uuidReceiver"])
         return uuids
 
-    async def getPlayerGuild(self, player) -> str:
+    async def getPlayerGuild(self, player: str) -> str:
         """returns the guild id (if any) of that which the provided player is in"""
 
-        if len(player) < 17:
+        if len(player) <= 16:
             player = await self.UsernameToUUID(player)
 
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
@@ -158,6 +162,6 @@ class Client:
 
     async def getLeaderboard(self):
 
-        data = await self.get('/leaderboards?key=api_key')
+        data = await self.get('leaderboards?key=api_key')
 
         return data
