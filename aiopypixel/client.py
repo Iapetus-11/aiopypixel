@@ -1,68 +1,101 @@
-from .exceptions.exceptions import *
 from typing import Union
 import aiohttp
 import asyncio
-import random
+from random import choice
+
+
+class RateLimited(Exception):
+    """A basic ratelimited error class when the bot gets ratelimited"""
+
+    def __init__(self, specifics, message="You're being rate limited! ({0})"):
+        self.message = message.format(specifics)
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
+
+
+class Error(Exception):
+    """A basic error class for easy handling/raising of a multitude of errors"""
+
+    def __init__(self, message="An error occurred!", cause="unknown"):
+        self.message = message + "\nCause: " + str(cause)
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
 
 
 class Client:
-
     def __init__(self, api_keys):
-        """basic initalization of the Hypixel API Client"""
-
         # Handles the instance of a singular key
         if not isinstance(api_keys, list):
             api_keys = [api_keys]
 
         self.API_KEYS = api_keys
+
+        self.BASE_URL = 'https://api.hypixel.net/'
+
         self.session = aiohttp.ClientSession()
-        self.BASE_URL = 'https://api.hypixel.net'
 
-    async def exit(self):
-        """safe cleanup and exit"""
-
+    async def close(self):
+        """Used for safe client cleanup and stuff"""
         await self.session.close()
 
-    async def get(self, url: str):
+    async def get(self, url: str) -> dict:
         """base method to fetch api response"""
 
-        response = await self.session.get(url.replace("api_key", random.choice(self.API_KEYS)))
+        response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", choice(self.API_KEYS)))
 
         if response.status == 429:
-            raise RateLimitError
+            raise RateLimited("Hypixel")
 
-        return response
+        return await response.json()
 
-    async def uuid_to_name(self, uuid: str):
+    async def GamertagToUUID(self, gamertag) -> str:
+        """takes in an mc gamertag and tries to convert it to a mc uuid"""
 
-        if len(uuid) > 16:  # provided data is uuid
-            response = await self.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}')
-            if response.status == 400:
-                raise InvalidPlayerError
-            else:
-                data = await response.json()
-                return data["name"]
+        data = await self.session.get("https://api.mojang.com/profiles/minecraft", json=[gamertag])
+        data = await data.json()
 
-    async def name_to_uuid(self, name: str) -> str:
+        if not data:
+            raise Error("An error occurred while converting gamertag to uuid!", "User couldn't be found!")
 
-        response = await self.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
-        if response.status == 204:
-            raise InvalidPlayerError
-        else:
-            data = await response.json()
-            return data["id"]
+        return j[0]["id"]
 
-    async def getFriends(self, player: str) -> Union[bool, list]:
+    async def UUIDToGamertag(self, uuid) -> str:
+        """takes in an mc uuid and converts it to an mc gamertag"""
+
+        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
+
+        if data.status == 204:
+            raise Error("An error occurred while converting uuid to gamertag!", "User couldn't be found!")
+
+        return (await data.json())[len(j) - 1]["name"]
+
+    async def getKeyData(self, key=None):
+        """fetches information from the api about the key used
+        uses a random key if none is specified"""
+
+        if key is None:
+            key = choice(self.API_KEYS)
+
+        data = await self.get(f"key?key={key}")
+
+        if not data["status"]:
+            raise Error("An error occured while fetching information on a key!", data.get("cause"))
+
+    async def getPlayerFriends(self, player) -> list:
         """returns the friends list of the provided player (list of uuids)
         if the user doesn't have any friends, returns an empty list"""
 
-        if len(player) < 16:
-            player = await self.name_to_uuid(player)
+        if len(player) < 17:
+            player = await self.GamertagToUUID(player)
 
-        data = await (await self.get(f"{self.BASE_URL}/friends?key=api_key&uuid={player}")).json()
+        data = await self.get(f"friends?key=api_key&uuid={player}")
 
         if not data["success"]:
-            return False  # raise error later
+            raise Error("Error while getting player friends!", data.get("cause"))
 
         uuids = []
 
@@ -73,17 +106,64 @@ class Client:
                 uuids.append(record["uuidReceiver"])
         return uuids
 
-    async def getGuildFromID(self, guild_id):
-        """gets hypixel guild data from the provided ID"""
+    async def getPlayerGuild(self, player) -> str:
+        """returns the guild id (if any) of that which the provided player is in"""
 
-        data = await (await self.get(f"{self.BASE_URL}/friends?key=api_key&id={guild_id}")).json()
+        if len(player) < 17:
+            player = await self.GamertagToUUID(player)
 
-    async def getRank(self, player):
-        """returns the provided player's hypixel rank"""
+        data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
-        if len(player) < 16:
-            player = await self.name_to_uuid(player)
+        if not data["success"]:
+            raise Error("Error while getting player guild!", data.get("cause"))
 
-        data = await (await self.get(f"{self.BASE_URL}/player?key=api_key&name={player}")).json()
+        return data["guild"]
+
+    async def getGuildID(self, guild_name):
+        """fetches a hypixel guild id based on the given guild name"""
+
+        data = await self.get(f"guild?key=api_key&name={guild_name}")
+
+        if not data["success"]:
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
+
+        return data["guild"]["_id"]
+
+    async def getGuildName(self, guild_id):
+        """fetches a hypixel guild name based on the given guild id"""
+
+        data = await self.get(f"guild?key=api_key&name={guild_id}")
+
+        if not data["success"]:
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
+
+        return data["guild"]["_id"]
+
+    async def getGuildData(self, guild_id):
+        """fetches a hypixel guild based on the given guild id"""
+
+        data = await self.get(f"guild?key=api_key&name={guild_id}")
+
+        if not data["success"]:
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
+
+        return data["guild"]
+
+    async def getPlayerCounts(self):
+        """fetches the player counts for every game on hypixel"""
+
+        data = await self.get(f"gameCounts?key=api_key")
+
+        if not data["success"]:
+            raise Error("An unknown error occurred!", data.get("cause"))
 
         return data
