@@ -64,4 +64,3 @@ async def getGameCounts():
     await client.close()
 
 asyncio.get_event_loop().run_until_complete(leaderboard())
-

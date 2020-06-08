@@ -89,7 +89,8 @@ class Client:
 
         return Player(
             raw_player["uuid"],
-            raw_player["_id"], raw_player["displayname"],
+            raw_player["_id"],
+            raw_player["displayname"],
             raw_player["firstLogin"],
             raw_player["lastLogin"],
             raw_player["networkExp"],
