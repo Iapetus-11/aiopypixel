@@ -1,7 +1,7 @@
 from typing import Union
 import aiohttp
 import asyncio
-import random
+from random import choice
 
 
 class RateLimited(Exception):
@@ -13,18 +13,9 @@ class RateLimited(Exception):
         return self.message
 
 
-class PlayerNotFound(Exception):
-    def __init__(self, specifics, message="That player couldn't be found! ({0})"):
-        self.message = message.format(specifics)
-        super().__init__(self.message)
-
-    def __str__(self):
-        return self.message
-
-
-class NotFound(Exception):
-    def __init__(self, specifics, message="{0} couldn't be found!"):
-        self.message = message.format(specifics)
+class Error(Exception):
+    def __init__(self, message="An error occurred!", cause="unknown"):
+        self.message = message + "\nCause: " + str(cause)
         super().__init__(self.message)
 
     def __str__(self):
@@ -50,7 +41,7 @@ class Client:
     async def get(self, url: str) -> dict:
         """base method to fetch api response"""
 
-        response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", random.choice(self.API_KEYS)))
+        response = await self.session.get(f"{self.BASE_URL}" + url.replace("api_key", choice(self.API_KEYS)))
 
         if response.status == 429:
             raise RateLimited("Hypixel")
@@ -64,7 +55,7 @@ class Client:
         data = await data.json()
 
         if not data:
-            raise PlayerNotFound("Error while converting gamertag to uuid!")
+            raise Error("An error occurred while converting gamertag to uuid!", "User couldn't be found!")
 
         return j[0]["id"]
 
@@ -74,9 +65,21 @@ class Client:
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
         if data.status == 204:
-            raise PlayerNotFound("Error while converting uuid to gamertag!")
+            raise Error("An error occurred while converting uuid to gamertag!", "User couldn't be found!")
 
         return (await data.json())[len(j) - 1]["name"]
+
+    async def getKeyData(self, key=None):
+        """fetches information from the api about the key used
+        uses a random key if none is specified"""
+
+        if key is None:
+            key = choice(self.API_KEYS)
+
+        data = await self.get(f"key?key={key}")
+
+        if not data["status"]:
+            raise Error("An error occured while fetching information on a key!", data.get("cause"))
 
     async def getPlayerFriends(self, player) -> list:
         """returns the friends list of the provided player (list of uuids)
@@ -88,7 +91,7 @@ class Client:
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
         if not data["success"]:
-            raise PlayerNotFound("Error while getting player friends!")
+            raise Error("Error while getting player friends!", data.get("cause"))
 
         uuids = []
 
@@ -108,7 +111,7 @@ class Client:
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
         if not data["success"]:
-            raise PlayerNotFound("Error while getting player guild!")
+            raise Error("Error while getting player guild!", data.get("cause"))
 
         return data["guild"]
 
@@ -118,7 +121,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_name}")
 
         if not data["success"]:
-            raise NotFound("Guild")
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
 
         return data["guild"]["_id"]
 
@@ -128,7 +134,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise NotFound("Guild")
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
 
         return data["guild"]["_id"]
 
@@ -138,9 +147,17 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_id}")
 
         if not data["success"]:
-            raise NotFound("Guild")
+            raise Error("An unknown error occurred!", data.get("cause"))
+
+        if data["guild"] is None:
+            raise Error("Guild not found!", "The API returned null!")
 
         return data["guild"]
 
-    async def getRank(self, player):
-        return await self.get(f"player?key=api_key&name={player}")
+    async def getPlayerCounts(self):
+        """fetches the player counts for every game on hypixel"""
+
+        data = await self.get(f"gameCounts?key=api_key")
+
+        if not data["success"]:
+            raise Error("An unknown error occurred!", data.get("cause"))
