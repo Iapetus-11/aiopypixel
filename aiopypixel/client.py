@@ -62,7 +62,7 @@ class Client:
 
         data = await self.get(f"key?key={key}")
 
-        if not data["status"]:
+        if not data["success"]:
             raise Error(f"An error occured while fetching information on a key! ({data.get('cause')})")
 
         return data

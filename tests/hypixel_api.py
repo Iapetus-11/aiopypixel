@@ -18,7 +18,7 @@ async def leaderboard():
 
 async def test_get_friends():
     client = aiopypixel.Client(api_key)
-    print(await client.getPlayerFriends("TrustedMercury"))
+    print(await client.getPlayerFriends("ajdjisjiwfojhfdijrk"))
     await client.close()
 
 
@@ -63,5 +63,5 @@ async def getGameCounts():
     await client.getGameCounts()
     await client.close()
 
-asyncio.get_event_loop().run_until_complete(rank())
+asyncio.get_event_loop().run_until_complete(leaderboard())
 
