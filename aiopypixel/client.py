@@ -41,7 +41,7 @@ class Client:
 
         response = await self.session.get(
             f"https://api.mojang.com/users/profiles/minecraft/{username}")
-        print(response)
+        print(await response.read())
         data = await response.json()
 
         if response.status == 204:
