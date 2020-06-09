@@ -5,7 +5,6 @@ from random import choice
 from typing import Union
 import aiohttp
 import asyncio
-import time
 
 
 class Client:
@@ -37,27 +36,29 @@ class Client:
 
         return await response.json()
 
-    async def UsernameToUUID(self, username: str) -> str:
+    async def usernameToUUID(self, username: str) -> str:
         """takes in an mc username and tries to convert it to a mc uuid"""
 
-        response = await self.session.get(
-            f"https://api.mojang.com/users/profiles/minecraft/{username}?at={int(time.time())}")
+        response = await self.session.post("https://api.mojang.com/profiles/minecraft", json=[username])
+
         data = await response.json()
 
-        if response.status == 204:
+        if response.status == 204 or data == []:
             raise InvalidPlayerError("Invalid username was supplied!")
 
-        return data["id"]
+        return data[0]["id"]
 
     async def UUIDToUsername(self, uuid: str) -> str:
         """takes in a minecraft UUID and converts it to a minecraft username"""
 
-        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
+        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
-        if data.status == 400:
+        if data.status == 204:
             raise InvalidPlayerError("Invalid UUID was supplied!")
 
-        return (await data.json())["name"]
+        data = await data.json()
+
+        return data[len(data) - 1]["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
@@ -77,7 +78,7 @@ class Client:
         """returns a player's data from the api"""
 
         if len(player) <= 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"player?key=api_key&uuid={player}")
 
@@ -110,7 +111,7 @@ class Client:
         if the user doesn't have any friends, returns an empty list"""
 
         if len(player) < 17:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"friends?key=api_key&uuid={player}")
 
@@ -131,7 +132,7 @@ class Client:
         returns None if the user doesn't have a guild"""
 
         if len(player) <= 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
@@ -156,7 +157,7 @@ class Client:
     async def getGuildNameByID(self, guild_id: str) -> str:
         """fetches a hypixel guild name based on the given guild id"""
 
-        data = await self.get(f"guild?key=api_key&name={guild_id}")
+        data = await self.get(f"guild?key=api_key&id={guild_id}")
 
         if not data["success"]:
             raise Error(f"An unknown error occurred ({data.get('cause')})!")
@@ -210,7 +211,7 @@ class Client:
         """returns the provided player's hypixel rank"""
 
         if len(player) < 16:
-            player = await self.UsernameToUUID(player)
+            player = await self.usernameToUUID(player)
 
         data = await self.get(f"{self.BASE_URL}/player?key={{api_key}}&name={player}")
 
