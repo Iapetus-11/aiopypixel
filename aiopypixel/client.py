@@ -53,10 +53,10 @@ class Client:
 
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}")
 
-        if data.status == 400:
+        if data.status == 204:
             raise InvalidPlayerError("Invalid UUID was supplied!")
 
-        return (await data.json())["name"]
+        return (await data.json())[len(data) - 1]["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
