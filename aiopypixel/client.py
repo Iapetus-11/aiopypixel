@@ -51,7 +51,7 @@ class Client:
     async def UUIDToUsername(self, uuid: str) -> str:
         """takes in a minecraft UUID and converts it to a minecraft username"""
 
-        data = await self.session.get(f"https://api.mojang.com/profiles/{uuid}/names")
+        data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
         if data.status == 204:
             raise InvalidPlayerError("Invalid UUID was supplied!")
