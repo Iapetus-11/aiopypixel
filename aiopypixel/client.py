@@ -56,9 +56,7 @@ class Client:
         if data.status == 204:
             raise InvalidPlayerError("Invalid UUID was supplied!")
 
-        json = await data.json()
-
-        return (json)[len(json) - 1]["name"]
+        return (await data.json())["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
