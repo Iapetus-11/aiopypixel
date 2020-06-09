@@ -157,7 +157,7 @@ class Client:
     async def getGuildNameByID(self, guild_id: str) -> str:
         """fetches a hypixel guild name based on the given guild id"""
 
-        data = await self.get(f"guild?key=api_key&name={guild_id}")
+        data = await self.get(f"guild?key=api_key&id={guild_id}")
 
         if not data["success"]:
             raise Error(f"An unknown error occurred ({data.get('cause')})!")
