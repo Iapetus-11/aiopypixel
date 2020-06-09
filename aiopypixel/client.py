@@ -116,8 +116,6 @@ class Client:
         if not data["success"]:
             raise Error(f"Error while getting player friends! ({data.get('cause')})")
 
-        print(data)
-
         uuids = []
 
         for record in data["records"]:
