@@ -186,15 +186,15 @@ class Client:
         raw_guild = await self.getGuildDataRaw(guild_id)
 
         return Guild(
-            raw_guild['_id'],
-            raw_guild['name'],
-            raw_guild['coins'],
-            raw_guild['created'],
-            raw_guild['exp'],
-            raw_guild['description'],
-            raw_guild['preferredGames'],
-            raw_guild['tag'],
-            raw_guild['members']
+            raw_guild.get('_id'),
+            raw_guild.get('name'),
+            raw_guild.get('coins'),
+            raw_guild.get('created'),
+            raw_guild.get('exp'),
+            raw_guild.get('description'),
+            raw_guild.get('preferredGames'),
+            raw_guild.get('tag'),
+            raw_guild.get('members')
         )
 
     async def getGameCounts(self) -> dict:
