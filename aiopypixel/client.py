@@ -137,7 +137,7 @@ class Client:
         data = await self.get(f"findGuild?key=api_key&byUuid={player}")
 
         if not data["success"]:
-            raise Error(f"Error while getting player guild! ({data.get('cause')})")
+            raise InvalidGuildError(data.get('cause'))
 
         return data["guild"]
 
@@ -147,10 +147,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&name={guild_name}")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred! ({data.get('cause')})")
+            raise InvalidGuildError(data.get('cause'))
 
         if data["guild"] is None:
-            raise Error("Guild not found!")
+            raise InvalidGuildError("Guild not found!")
 
         return data["guild"]["_id"]
 
@@ -160,10 +160,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&id={guild_id}")
 
         if not data["success"]:
-            raise Error(f"An unknown error occurred ({data.get('cause')})!")
+            raise InvalidGuildError(data.get('cause'))
 
         if data["guild"] is None:
-            raise Error("Guild not found!")
+            raise InvalidGuildError("Guild not found!")
 
         return data["guild"]["name"]
 
@@ -173,10 +173,10 @@ class Client:
         data = await self.get(f"guild?key=api_key&id={guild_id}")
 
         if not data["success"]:
-            raise Error(data.get('cause'))
+            raise InvalidGuildError(data.get('cause'))
 
         if data["guild"] is None:
-            raise Error("Guild not found!")
+            raise InvalidGuildError("Guild not found!")
 
         return data["guild"]
 
