@@ -32,10 +32,10 @@ class InvalidPlayerError(Exception):
 
 
 class NullPlayerError(Exception):
-    """Raised when an invalid player name or uuid is provided"""
+    """Raised when the player endpoint returns null for a player"""
 
-    def __init__(self, cause="unknown cause"):
-        self.message = f"Player hasn't joined hypixel before!"
+    def __init__(self):
+        self.message = f"Player returned was null! (Player hasn't joined Hypixel before!)"
         super().__init__(self.message)
 
     def __str__(self):

@@ -85,6 +85,9 @@ class Client:
         if not data["success"]:
             raise Error(f"An error occurred while fetching a player from the api! ({data.get('cause')})")
 
+        if data["player"] is None:
+            raise NullPlayerError
+
         return data["player"]
 
     async def getPlayer(self, player) -> Player:
