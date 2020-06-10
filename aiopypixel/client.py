@@ -228,4 +228,4 @@ class Client:
         return data
 
     async def calcPlayerLevel(self, xp) -> int:
-        return lambda x: 1 + (-8750. + (8750 ** 2 + 5000 * x) ** .5) / 2500
+        return int(lambda x: 1 + (-8750. + (8750 ** 2 + 5000 * x) ** .5) / 2500)
