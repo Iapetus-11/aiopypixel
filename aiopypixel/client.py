@@ -218,13 +218,14 @@ class Client:
         return data
 
     async def getLeaderboard(self) -> dict:
-
         data = await self.get('leaderboards?key=api_key')
 
         return data
 
     async def getWatchdogStats(self) -> dict:
-
         data = await self.get(f"watchdogstats?key=api_key")
 
         return data
+
+    async def calcPlayerLevel(self, xp) -> int:
+        return lambda x: 1 + (-8750. + (8750 ** 2 + 5000 * x) ** .5) / 2500
