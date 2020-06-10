@@ -207,16 +207,6 @@ class Client:
 
         return data
 
-    async def getRank(self, player: str) -> dict:
-        """returns the provided player's hypixel rank"""
-
-        if len(player) < 16:
-            player = await self.usernameToUUID(player)
-
-        data = await self.get(f"{self.BASE_URL}/player?key={{api_key}}&name={player}")
-
-        return data
-
     async def getLeaderboard(self) -> dict:
         data = await self.get('leaderboards?key=api_key')
 
