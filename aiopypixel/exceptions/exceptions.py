@@ -29,3 +29,14 @@ class InvalidPlayerError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class InvalidGuildError(Exception):
+    """Raised when an invalid guild name or id is provided"""
+
+    def __init__(self, cause="unknown cause"):
+        self.message = f"Invalid guild name or id was provided! ({cause})"
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
