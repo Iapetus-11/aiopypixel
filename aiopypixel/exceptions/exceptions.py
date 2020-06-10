@@ -31,6 +31,17 @@ class InvalidPlayerError(Exception):
         return self.message
 
 
+class NullPlayerError(Exception):
+    """Raised when an invalid player name or uuid is provided"""
+
+    def __init__(self, cause="unknown cause"):
+        self.message = f"Player hasn't joined hypixel before!"
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
+
+
 class InvalidGuildError(Exception):
     """Raised when an invalid guild name or id is provided"""
 
