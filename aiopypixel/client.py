@@ -101,16 +101,16 @@ class Client:
         raw_player = await self.getPlayerRaw(player)
 
         return Player(
-            raw_player["uuid"],
-            raw_player["_id"],
-            raw_player["displayname"],
-            raw_player["firstLogin"],
-            raw_player["lastLogin"],
-            raw_player["lastLogout"],
-            raw_player["networkExp"],
-            raw_player["stats"],
-            raw_player["achievements"],
-            raw_player["achievementsOneTime"],
+            raw_player.get("uuid"),
+            raw_player.get("_id"),
+            raw_player.get("displayname"),
+            raw_player.get("firstLogin"),
+            raw_player.get("lastLogin"),
+            raw_player.get("lastLogout"),
+            raw_player.get("networkExp"),
+            raw_player.get("stats"),
+            raw_player.get("achievements"),
+            raw_player.get("achievementsOneTime"),
             await self.getPlayerGuild(player)
         )
 
