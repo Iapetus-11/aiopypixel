@@ -58,7 +58,12 @@ class Client:
 
         data = await data.json()
 
-        return data[len(data) - 1]["name"]
+        data = data.get(len(data) - 1)
+
+        if data is None:
+            raise InvalidPlayerError("Something went wrong!")
+
+        return data["name"]
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
