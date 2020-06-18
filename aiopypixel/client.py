@@ -60,7 +60,7 @@ class Client:
 
         try:
             return data[len(data) - 1]["name"]
-        except KeyError:
+        except Exception:
             raise InvalidPlayerError("Something went wrong!")
 
     async def getKeyData(self, key: str = None) -> dict:
