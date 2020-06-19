@@ -109,6 +109,10 @@ class Client:
             raw_player.get("stats"),
             raw_player.get("achievements"),
             raw_player.get("achievementsOneTime"),
+            raw_player.get("karma"),
+            raw_player.get("prefix"),
+            raw_player.get("rank"),
+            raw_player.get("timePlaying"),
             await self.getPlayerGuild(player)
         )
 
