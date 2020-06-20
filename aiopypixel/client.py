@@ -207,6 +207,16 @@ class Client:
             raw_guild.get('members')
         )
 
+    async def getSkyblockStats(self, profile: str) -> dict:
+        """returns skyblock statistics of the provided skyblock profile"""
+
+        data = await self.get(f"key=api_key&profile={profile}")
+
+        if not data["success"]:
+            raise InvalidSkyblockProfileError
+
+        return data["profile"]
+
     async def getGameCounts(self) -> dict:
         """fetches the player counts for every game on hypixel"""
 
