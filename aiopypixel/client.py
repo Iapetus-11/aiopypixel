@@ -210,7 +210,7 @@ class Client:
     async def getSkyblockStats(self, profile: str) -> dict:
         """returns skyblock statistics of the provided skyblock profile"""
 
-        data = await self.get(f"profile?key=api_key&profile={profile}")
+        data = await self.get(f"skyblock?key=api_key&profile={profile}")
 
         if not data["success"]:
             raise InvalidSkyblockProfileError
