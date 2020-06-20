@@ -51,3 +51,14 @@ class InvalidGuildError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class InvalidSkyblockProfileError(Exception):
+    """Raised when an invalid skyblock profile is provided."""
+
+    def __init__(self, cause="unknown cause"):
+        self.message = f"Invalid skyblock profile id was provided! ({cause})"
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
