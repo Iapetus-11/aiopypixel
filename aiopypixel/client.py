@@ -43,7 +43,7 @@ class Client:
 
         data = await response.json()
 
-        if response.status == 204 or data == [] or data.get("error") is not None:
+        if response.status == 204 or data == [] or type(data) == dict:
             raise InvalidPlayerError("Invalid username was supplied!")
 
         return data[0]["id"]
