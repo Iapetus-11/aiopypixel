@@ -112,6 +112,7 @@ class Client:
             raw_player.get("karma"),
             raw_player.get("prefix"),
             raw_player.get("newPackageRank"),
+            raw_player.get("monthlyPackageRank"),
             raw_player.get("timePlaying"),
             await self.getPlayerGuild(player)
         )
