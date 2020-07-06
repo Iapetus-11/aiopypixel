@@ -2,7 +2,7 @@
 class Player:
 
     def __init__(self, uuid, hypixel_id, display_name, first_login, last_login, last_logout, exp, stats, achievements,
-                 one_time_achievements, karma, prefix, rank, monthly_rank, time_playing, guild):
+                 one_time_achievements, karma, prefix, rank, monthly_rank, time_playing, linked_accounts, guild):
         """A base class for a hypixel player that contains only the most important data"""
         self.UUID = uuid
         self.HYPIXEL_ID = hypixel_id
@@ -19,4 +19,5 @@ class Player:
         self.RANK = rank
         self.MONTHLY_RANK = monthly_rank
         self.TIME_PLAYING = time_playing
+        self.LINKED_ACCOUNTS = linked_accounts
         self.GUILD = guild

@@ -114,6 +114,7 @@ class Client:
             raw_player.get("newPackageRank"),
             raw_player.get("monthlyPackageRank"),
             raw_player.get("timePlaying"),
+            raw_player.get("socialMedia"),
             await self.getPlayerGuild(player)
         )
 
