@@ -34,6 +34,10 @@ class Client:
         if response.status == 429:
             raise RateLimitError("Hypixel")
 
+        print(response.status)
+        print(response.reason)
+        print(response.headers)
+
         return await response.json()
 
     async def usernameToUUID(self, username: str) -> str:
