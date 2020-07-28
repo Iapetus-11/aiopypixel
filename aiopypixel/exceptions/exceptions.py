@@ -23,9 +23,12 @@ class RateLimitError(Exception):
 class InvalidPlayerError(Exception):
     """Raised when an invalid player name or uuid is provided"""
 
-    def __init__(self, cause="unknown cause"):
+    def __init__(self, cause, player):
         self.message = f"Invalid player name or uuid was provided! ({cause})"
         super().__init__(self.message)
+
+        self.cause = cause
+        self.player = player
 
     def __str__(self):
         return self.message

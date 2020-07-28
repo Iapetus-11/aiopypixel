@@ -47,7 +47,7 @@ class Client:
         data = await response.json()
 
         if response.status == 204 or data == [] or type(data) == dict:
-            raise InvalidPlayerError("Invalid username was supplied!")
+            raise InvalidPlayerError("Invalid username was supplied!", username)
 
         return data[0]["id"]
 
@@ -57,17 +57,17 @@ class Client:
         data = await self.session.get(f"https://api.mojang.com/user/profiles/{uuid}/names")
 
         if data.status == 204:
-            raise InvalidPlayerError("Invalid UUID was supplied!")
+            raise InvalidPlayerError("Invalid UUID was supplied!", uuid)
 
         data = await data.json()
 
         if not data:
-            raise InvalidPlayerError("Something went wrong!")
+            raise InvalidPlayerError("Something went wrong!", uuid)
 
         try:
             return data[len(data) - 1]["name"]
         except Exception:
-            raise InvalidPlayerError
+            raise InvalidPlayerError("Something went wrong!", uuid)
 
     async def getKeyData(self, key: str = None) -> dict:
         """fetches information from the api about the key used
