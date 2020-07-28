@@ -34,6 +34,9 @@ class Client:
         if response.status == 429:
             raise RateLimitError("Hypixel")
 
+        if response.headers.get("CONTENT-TYPE") != "application/json":
+            raise HypixelAPIError("content type returned was not json")
+
         return await response.json()
 
     async def usernameToUUID(self, username: str) -> str:
