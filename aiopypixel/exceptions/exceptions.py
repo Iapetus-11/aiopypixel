@@ -62,3 +62,14 @@ class InvalidSkyblockProfileError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class HypixelAPIError(Exception):
+    """Raised when the Hypixel API decides to shit itself."""
+
+    def __init__(self, cause="unknown cause"):
+        self.message = f"The Hypixel API had a problem ({cause})"
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
