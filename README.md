@@ -1,4 +1,4 @@
-# **aiopypixel** ![PYPI Downloads](https://img.shields.io/pypi/dd/aiopypixel)
+# **aiopypixel** ![PYPI Downloads](https://img.shields.io/pypi/dw/aiopypixel?color=77d5af&style=plastic)
 *A complete, asynchronous wrapper for the Hypixel API*
 
 If you'd like to help out or if you've found a bug, open a pull request or bug report!
